@@ -139,7 +139,7 @@ export default function HomePage() {
         </div>
 
         {/* Extra Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
           <DetailCard
             icon={<FaEnvelope />}
             title="Post Office"
@@ -180,7 +180,7 @@ export default function HomePage() {
             title="PIN Code"
             value={pollingDetails["Pin code"]}
           />
-        </div>
+        </div> */}
 
         {/* Filter Inputs */}
         <FilterBar filters={filters} setFilters={setFilters} />
