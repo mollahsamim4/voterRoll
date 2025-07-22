@@ -109,30 +109,34 @@ export default function HomePage() {
 
         {/* Chart Section */}
         <div className="bg-white rounded-lg shadow p-4 mb-8">
-  <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">Voters Gender Distribution</h2>
-  <div className="flex justify-center w-full h-60">
-    <ResponsiveContainer width="100%" height="100%">
-      <PieChart>
-        <Pie
-          data={genderData}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          outerRadius="70%"
-          label
-        >
-          {genderData.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={['#3498db', '#e74c3c'][index % 2]} />
-          ))}
-        </Pie>
-        <Tooltip />
-        <Legend verticalAlign="bottom" height={30} />
-      </PieChart>
-    </ResponsiveContainer>
-  </div>
-</div>
-
+          <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">
+            Voters Gender Distribution
+          </h2>
+          <div className="flex justify-center w-full h-60">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={genderData}
+                  dataKey="value"
+                  nameKey="name"
+                  cx="50%"
+                  cy="50%"
+                  outerRadius="70%"
+                  label
+                >
+                  {genderData.map((entry, index) => (
+                    <Cell
+                      key={`cell-${index}`}
+                      fill={["#3498db", "#e74c3c"][index % 2]}
+                    />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend verticalAlign="bottom" height={30} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
 
         {/* Extra Details */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
@@ -188,6 +192,8 @@ export default function HomePage() {
               <tr className="bg-gray-800 text-white">
                 <th className="p-2 border">Sr. No.</th>
                 <th className="p-2 border">Name</th>
+                <th className="p-2 border">Relation Type</th>
+                <th className="p-2 border">Relation Name</th>
                 <th className="p-2 border">House No</th>
                 <th className="p-2 border">Elector ID</th>
                 <th className="p-2 border">Gender</th>
@@ -203,6 +209,8 @@ export default function HomePage() {
                   >
                     <td className="p-2 border">{voter.serialNumber}</td>
                     <td className="p-2 border">{voter.name}</td>
+                    <td className="p-2 border">{voter.relationType}</td>
+                    <td className="p-2 border">{voter.relationName}</td>
                     <td className="p-2 border">{voter.houseNumber}</td>
                     <td className="p-2 border">{voter.electorId}</td>
                     <td className="p-2 border">{voter.gender}</td>
