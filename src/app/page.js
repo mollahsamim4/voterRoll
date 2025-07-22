@@ -1,103 +1,225 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useState, useEffect } from "react";
+import FilterBar from "@/components/FilterBar";
+import SummaryCard from "@/components/SummaryCard";
+import DetailCard from "@/components/DetailCard";
+import electoralData from "@/data/electoral.json";
+
+import {
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  FaUsers,
+  FaHome,
+  FaSchool,
+  FaMapMarkerAlt,
+  FaEnvelope,
+  FaShieldAlt,
+  FaBuilding,
+  FaCity,
+} from "react-icons/fa";
+
+const COLORS = ["#3498db", "#e74c3c"]; // Blue for Male, Red for Female
+
+export default function HomePage() {
+  const [voters, setVoters] = useState([]);
+  const [filteredVoters, setFilteredVoters] = useState([]);
+  const [filters, setFilters] = useState({
+    name: "",
+    serialNumber: "",
+    electorId: "",
+  });
+
+  const netVoters = voters.length;
+  const pollingDetails =
+    electoralData["2_Details of part and polling area"] || {};
+
+  useEffect(() => {
+    if (electoralData && electoralData["4_NUMBER OF ELECTORS"]) {
+      const allVoters = electoralData.electors || [];
+      setVoters(allVoters);
+      setFilteredVoters(allVoters);
+    }
+  }, []);
+
+  useEffect(() => {
+    const temp = voters.filter((voter) => {
+      const nameMatch = (voter.name || "")
+        .toLowerCase()
+        .includes(filters.name.toLowerCase());
+      const serialMatch = (voter.serialNumber || "")
+        .toString()
+        .includes(filters.serialNumber);
+      const electorIdMatch = (voter.electorId || "")
+        .toLowerCase()
+        .includes(filters.electorId.toLowerCase());
+      return nameMatch && serialMatch && electorIdMatch;
+    });
+    setFilteredVoters(temp);
+  }, [filters, voters]);
+
+  // Gender Count for Chart
+  // No voters array needed now
+  const maleCount = Number(
+    electoralData["4_NUMBER OF ELECTORS"]["Net Electors"]["Male"] || 0
+  );
+  const femaleCount = Number(
+    electoralData["4_NUMBER OF ELECTORS"]["Net Electors"]["Female"] || 0
+  );
+
+  const genderData = [
+    { name: "Male", value: maleCount },
+    { name: "Female", value: femaleCount },
+  ];
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.js
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="flex justify-center bg-gradient-to-b from-blue-50 to-blue-100 min-h-screen py-8">
+      <div className="w-11/12">
+        <h1 className="text-3xl font-bold text-center mb-8 text-blue-800">
+          Polling Area Dashboard
+        </h1>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Summary Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <SummaryCard
+            icon={<FaUsers />}
+            title="Total Voters"
+            value={netVoters}
+            color="blue"
+          />
+          <SummaryCard
+            icon={<FaHome />}
+            title="Village"
+            value={pollingDetails["Main Town or Village"]}
+            color="green"
+          />
+          <SummaryCard
+            icon={<FaSchool />}
+            title="Polling Station"
+            value={pollingDetails["Polling Station"]}
+            color="yellow"
+          />
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+
+        {/* Chart Section */}
+        <div className="bg-white rounded-lg shadow p-4 mb-8">
+  <h2 className="text-xl font-semibold text-gray-700 mb-4 text-center">Voters Gender Distribution</h2>
+  <div className="flex justify-center w-full h-60">
+    <ResponsiveContainer width="100%" height="100%">
+      <PieChart>
+        <Pie
+          data={genderData}
+          dataKey="value"
+          nameKey="name"
+          cx="50%"
+          cy="50%"
+          outerRadius="70%"
+          label
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          {genderData.map((entry, index) => (
+            <Cell key={`cell-${index}`} fill={['#3498db', '#e74c3c'][index % 2]} />
+          ))}
+        </Pie>
+        <Tooltip />
+        <Legend verticalAlign="bottom" height={30} />
+      </PieChart>
+    </ResponsiveContainer>
+  </div>
+</div>
+
+
+        {/* Extra Details */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+          <DetailCard
+            icon={<FaEnvelope />}
+            title="Post Office"
+            value={pollingDetails["Post Office"]}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
+          <DetailCard
+            icon={<FaShieldAlt />}
+            title="Police Station"
+            value={pollingDetails["Police Station"]}
           />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
+          <DetailCard
+            icon={<FaBuilding />}
+            title="Panchayat"
+            value={pollingDetails["Panchayat"]}
           />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <DetailCard
+            icon={<FaBuilding />}
+            title="Block"
+            value={pollingDetails["Block"]}
+          />
+          <DetailCard
+            icon={<FaBuilding />}
+            title="Tehsil"
+            value={pollingDetails["Tehsil"]}
+          />
+          <DetailCard
+            icon={<FaBuilding />}
+            title="Subdivision"
+            value={pollingDetails["Subdivision"]}
+          />
+          <DetailCard
+            icon={<FaCity />}
+            title="District"
+            value={pollingDetails["District"]}
+          />
+          <DetailCard
+            icon={<FaMapMarkerAlt />}
+            title="PIN Code"
+            value={pollingDetails["Pin code"]}
+          />
+        </div>
+
+        {/* Filter Inputs */}
+        <FilterBar filters={filters} setFilters={setFilters} />
+
+        {/* Voter List Table */}
+        <div className="overflow-x-auto mt-6">
+          <table className="table-auto w-full border">
+            <thead>
+              <tr className="bg-gray-800 text-white">
+                <th className="p-2 border">Sr. No.</th>
+                <th className="p-2 border">Name</th>
+                <th className="p-2 border">House No</th>
+                <th className="p-2 border">Elector ID</th>
+                <th className="p-2 border">Gender</th>
+                <th className="p-2 border">Age</th>
+              </tr>
+            </thead>
+            <tbody className="text-gray-800">
+              {filteredVoters.length > 0 ? (
+                filteredVoters.map((voter, idx) => (
+                  <tr
+                    key={idx}
+                    className="hover:bg-sky-700 hover:text-white transition"
+                  >
+                    <td className="p-2 border">{voter.serialNumber}</td>
+                    <td className="p-2 border">{voter.name}</td>
+                    <td className="p-2 border">{voter.houseNumber}</td>
+                    <td className="p-2 border">{voter.electorId}</td>
+                    <td className="p-2 border">{voter.gender}</td>
+                    <td className="p-2 border">{voter.age}</td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="6" className="text-center p-6 text-gray-600">
+                    No voters found.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   );
 }
